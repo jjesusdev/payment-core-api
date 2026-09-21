@@ -3,7 +3,6 @@ package com.jibanez.paymentcore.transaction;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,9 +58,6 @@ class TransactionServiceTest {
         when(accountRepository.findIdByAccountNo("1000000002")).thenReturn(Optional.of(toId));
         when(accountRepository.findByIdForUpdate(fromId)).thenReturn(Optional.of(from));
         when(accountRepository.findByIdForUpdate(toId)).thenReturn(Optional.of(to));
-        when(accountRepository.findByAccountNo(anyString())).thenReturn(Optional.empty());
-        when(accountRepository.findByAccountNo("1000000001")).thenReturn(Optional.of(from));
-        when(accountRepository.findByAccountNo("1000000002")).thenReturn(Optional.of(to));
     }
 
     @Test
@@ -113,7 +109,7 @@ class TransactionServiceTest {
     @Test
     void transfer_rejectsWhenOriginNotFound() {
         stubAccounts(1L, 2L);
-        when(accountRepository.findByAccountNo("1000000001")).thenReturn(Optional.empty());
+        when(accountRepository.findIdByAccountNo("1000000001")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.transfer(
                 new TransferRequest("1000000001", "1000000002", new BigDecimal("100.00")),

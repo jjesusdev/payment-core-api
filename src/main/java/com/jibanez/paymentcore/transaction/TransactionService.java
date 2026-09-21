@@ -46,16 +46,6 @@ public class TransactionService {
         if (request.fromAccountNo().equals(request.toAccountNo())) {
             throw new BusinessExceptions.SameAccountException();
         }
-        Account from = accountRepository.findByAccountNo(request.fromAccountNo())
-                .orElseThrow(BusinessExceptions.AccountNotFoundException::new);
-        Account to = accountRepository.findByAccountNo(request.toAccountNo())
-                .orElseThrow(BusinessExceptions.AccountNotFoundException::new);
-        if (!from.getOwner().getUsername().equals(ownerUsername)) {
-            throw new BusinessExceptions.AccountAccessDeniedException();
-        }
-        if (from.getStatus() != AccountStatus.ACTIVE) {
-            throw new BusinessExceptions.AccountInactiveException();
-        }
         Long fromId = accountRepository.findIdByAccountNo(request.fromAccountNo())
                 .orElseThrow(BusinessExceptions.AccountNotFoundException::new);
         Long toId = accountRepository.findIdByAccountNo(request.toAccountNo())
@@ -64,6 +54,12 @@ public class TransactionService {
         Account second = lockById(Math.max(fromId, toId));
         Account debitAccount = first.getAccountNo().equals(request.fromAccountNo()) ? first : second;
         Account creditAccount = first.getAccountNo().equals(request.fromAccountNo()) ? second : first;
+        if (!debitAccount.getOwner().getUsername().equals(ownerUsername)) {
+            throw new BusinessExceptions.AccountAccessDeniedException();
+        }
+        if (debitAccount.getStatus() != AccountStatus.ACTIVE) {
+            throw new BusinessExceptions.AccountInactiveException();
+        }
         if (debitAccount.getBalance().compareTo(request.amount()) < 0) {
             throw new BusinessExceptions.InsufficientBalanceException();
         }
@@ -73,7 +69,7 @@ public class TransactionService {
                 TransactionKind.TRANSFER, request.amount(), debitAccount.getCurrency(),
                 UUID.randomUUID().toString(), fromId, toId));
         return toResponse(tx, request.amount(), debitAccount.getCurrency(),
-                from.getAccountNo(), to.getAccountNo());
+                debitAccount.getAccountNo(), creditAccount.getAccountNo());
     }
 
     private Account lockByAccountNo(String accountNo) {
