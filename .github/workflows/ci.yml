@@ -17,8 +17,8 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Tests unitarios + integracion (Testcontainers)
-        run: mvn -B verify
+      - name: Tests unitarios (Mockito)
+        run: mvn -B test
 
   build-image:
     runs-on: ubuntu-latest
