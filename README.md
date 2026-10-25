@@ -71,3 +71,15 @@ mvn verify        # + integración (Testcontainers PostgreSQL 16)
 ```
 
 Ver [docs/metrics.md](docs/metrics.md) para los recibos (recuentos reales de este repo).
+## OpenAPI / Swagger
+
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
+
+## Idempotencia
+
+Las transferencias admiten la cabecera `Idempotency-Key` (UUID). Si se repite la misma clave con el mismo cuerpo, se devuelve la respuesta almacenada. Si se reutiliza con un cuerpo distinto, se responde `409 IDEMPOTENCY_CONFLICT`.
+
+## Paquete de imagen
+
+En `main`, el workflow publica `ghcr.io/jjesusdev/payment-core-api:latest` y `ghcr.io/jjesusdev/payment-core-api:<sha>`.

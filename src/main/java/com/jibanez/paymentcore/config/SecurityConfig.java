@@ -41,7 +41,7 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
-                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info", "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(eh -> eh.authenticationEntryPoint((request, response, ex) ->
                         writeJson(response, 401, ApiError.of("UNAUTHORIZED", "Autenticacion requerida"))))
