@@ -56,4 +56,10 @@ public final class BusinessExceptions {
             super("INVALID_CREDENTIALS", "Credenciales invalidas", 401);
         }
     }
+
+    public static final class IdempotencyConflictException extends BusinessException {
+        public IdempotencyConflictException() {
+            super("IDEMPOTENCY_CONFLICT", "La clave de idempotencia ya fue usada con un cuerpo distinto", 409);
+        }
+    }
 }

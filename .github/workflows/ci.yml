@@ -37,3 +37,37 @@ jobs:
 
       - name: Construir imagen Docker
         run: docker build -t payment-core-api:ci .
+
+  publish-ghcr:
+    runs-on: ubuntu-latest
+    needs: [test, build-image]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Iniciar sesión en GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extraer metadatos
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/jjesusdev/payment-core-api
+          tags: |
+            type=sha
+            type=raw,value=latest
+
+      - name: Construir y publicar imagen
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
